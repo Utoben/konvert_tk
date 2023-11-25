@@ -3,32 +3,31 @@ from tkinter import ttk
 import requests
 from config import *
 
-
-headers= {
-  "apikey": API_KEY,
-}
-
+# Этого кода еще нет - допиши в верхнюю часть
 uah = 'UAH'
 rub = 'RUB'
 eur = 'EUR'
 usd = 'USD'
 
-# создаем url запроса на сервер с нужными нам валютами
-def make_url(currency_to, currency_from, amount):
-	return f"https://api.apilayer.com/currency_data/convert?to={currency_to}&from={currency_from}&amount={amount}"
-
 # отправялем GET запрос на сервер и обрабатываем его ответ, извлекаем результат
-def get_konvert(to):
-		response=requests.get(to, headers=headers)
-		if response.status_code == 200:
-			result_json = response.json()
-			result=result_json.get("result")
-			res=round(result,3)
-			print(f'Результат конвертации: {res}')
-			return res
-		else:
-			print(f'Проблема: {response.status_code}')
-			return 0
+def get_konvert(currency_to, currency_from, amount):
+
+	url = f"https://api.apilayer.com/currency_data/convert?to={currency_to}&from={currency_from}&amount={amount}"
+
+	headers= {
+  		"apikey": API_KEY,
+	}
+
+	response=requests.get(url, headers=headers)
+	if response.status_code == 200:
+		result_json = response.json()
+		result=result_json.get("result")
+		res=round(result,3)
+		print(f'Результат конвертации: {res}')
+		return res
+	else:
+		print(f'Проблема: {response.status_code}')
+		return 0
 
 def konvert():
 	val2.delete(0, END)
@@ -36,45 +35,31 @@ def konvert():
 	b=com.get() #первый комбобокс
 	d=com2.get() #второй комбобокс
 
-	# url для каждого уникального запроса. make_url(валюта_в_которую_конвертим, валюта_из_котор_конертим, количество)
-	eur_to_usd = make_url(usd, eur, a)
-	eur_to_rub = make_url(rub, eur, a)
-	eur_to_uah = make_url(uah, eur, a)
-	
-	usd_to_eur = make_url(eur, usd, a)
-	usd_to_uah = make_url(uah, usd, a)
-	usd_to_rub = make_url(rub, usd, a)
-
-	rub_to_eur = make_url(eur, rub, a)
-	rub_to_uah = make_url(uah, rub, a)
-	rub_to_usd = make_url(usd, rub, a)
-
-	uah_to_eur = make_url(eur, uah, a)
-	uah_to_rub = make_url(rub, uah, a)
-	uah_to_usd = make_url(usd, uah, a)
 		
 	if b=='EUR' and d!='EUR': # если конвертим из EUR
-		if d=='USD': result = get_konvert(eur_to_usd)
-		if d=='UAN': result = get_konvert(eur_to_uah)
-		if d=='RUB': result = get_konvert(eur_to_rub)
+		if d=='USD': result = get_konvert(usd, eur, a)
+		if d=='UAN': result = get_konvert(uah, eur, a)
+		if d=='RUB': result = get_konvert(rub, eur, a)
+	# сюда поставить else: окно Ошибка
 
 	if b=='USD' and d!='USD': # если конвертим из USD
-		if d=='EUR': result = get_konvert(usd_to_eur)
-		if d=='UAN': result = get_konvert(usd_to_uah)
-		if d=='RUB': result = get_konvert(usd_to_rub)
+		if d=='EUR': result = get_konvert(eur, usd, a)
+		if d=='UAN': result = get_konvert(uah, usd, a)
+		if d=='RUB': result = get_konvert(rub, usd, a)
 		
 	if b=='UAN' and d!='UAN': # если конвертим из UAN
-		if d=='USD': result = get_konvert(uah_to_usd)
-		if d=='EUR': result = get_konvert(uah_to_eur)
-		if d=='RUB': result = get_konvert(uah_to_rub)
+		if d=='USD': result = get_konvert(usd, uah, a)
+		if d=='EUR': result = get_konvert(eur, uah, a)
+		if d=='RUB': result = get_konvert(rub, uah, a)
 
 	if b=='RUB' and d!='RUB': # если конвертим из RUB
-		if d=='USD': result = get_konvert(rub_to_usd)
-		if d=='EUR': result = get_konvert(rub_to_eur)
-		if d=='UAN': result = get_konvert(rub_to_uah)
+		if d=='USD': result = get_konvert(usd, rub, a)
+		if d=='EUR': result = get_konvert(eur, rub, a)
+		if d=='UAN': result = get_konvert(uah, rub, a)
 
 	val2.insert(0 , result) #выводим результат в поле 2
 
+# остальной код создания окна - он уже у тебя есть
 def center(win):
 	win.update_idletasks()
 	width = win.winfo_width()
@@ -89,10 +74,6 @@ window.geometry('500x300')
 center(window)
 window.resizable(False, False)
 
-USD=73.0 # курс доллара
-EUR=90.1 # курс евро
-UAN=11.4 # курс юань
-RUB=1    # рубль
 VAL=['USD','EUR','UAN' ,'RUB'] #список валют
 
 Label(window, text='Конвертор валют' , font='Times 30').pack()
